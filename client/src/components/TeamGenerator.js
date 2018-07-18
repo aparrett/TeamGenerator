@@ -1,54 +1,47 @@
 const TeamGenerator = () => {
   // Testing with 3 players per team and 15 players total.
   const players = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-  const max = Math.floor(players.length / 3);
+  const numTeams = Math.floor(players.length / 3);
   const teamSize = 3;
+  const rounds = 5;
+  // The rounds needed until any given player has played with everyone.
+  const roundsNeeded = Math.floor(players.length / (teamSize - 1));
   let teammateCounters = [];
-  let matchups = [];
-  let rounds = [];
+  let roundsOfTeams = [];
 
+  fillTeammateCounters();
 
-  // Fill teammateCounters with empty values.
-  for (let i = 0; i < players.length; i++) {
-    teammateCounters[i] = new Array(players.length + 1).join('0').split('').map(parseFloat);
+  // Create rounds of teams.
+  for (let i = 1; i <= rounds; i++){
+    const round = generateRoundOfTeams();
+    roundsOfTeams.push(round);
+
+    if (i === roundsNeeded) {
+      fillTeammateCounters();
+    }
+
+    addTeammateCounters(round);
   }
 
-  // Create first round of teams.
-  rounds.push(generateRoundOfTeams(players));
-  addTeammateCounters(rounds[0]);
-  matchups.push(rounds[0]);
-  console.log('round', rounds[0]);
+  console.log('rounds of teams', roundsOfTeams);
+  console.log('teammate counters', teammateCounters);
 
-  console.log('teammateCounters', teammateCounters);
-  console.log('matchups', matchups);
-
-  // Create another round of teams.
-  rounds.push(generateRoundOfTeams(players));
-  addTeammateCounters(rounds[1]);
-  matchups.push(rounds[1]);
-  console.log('round', rounds[1])
-
-  // Create another round of teams.
-  rounds.push(generateRoundOfTeams(players));
-  addTeammateCounters(rounds[2]);
-  matchups.push(rounds[2]);
-  console.log('round', rounds[2])
-
-  // Create another round of teams.
-  rounds.push(generateRoundOfTeams(players));
-  addTeammateCounters(rounds[3]);
-  matchups.push(rounds[3]);
-  console.log('round', rounds[3])
-
-  console.log('teammateCounters', teammateCounters);
-  console.log('matchups', matchups);
+    // Fill teammateCounters with empty values to represent that a player
+  // has not yet played with any player.
+  function fillTeammateCounters() {
+    let counters = [];
+    for (let i = 0; i < players.length; i++) {
+      counters[i] = new Array(players.length + 1).join('0').split('').map(parseFloat);
+    }
+    teammateCounters = counters;
+  }
 
   function generateRoundOfTeams() {
     let teams = [];
-    if (rounds.length === 0) {
+    if (roundsOfTeams.length === 0) {
       const playersShuffled = shuffle(players);
       
-      for (let i = 0; i < max; i++) {
+      for (let i = 0; i < numTeams; i++) {
         const team = playersShuffled.slice(i*3, i*3+3);
         teams.push(team);
       }
@@ -67,7 +60,6 @@ const TeamGenerator = () => {
       // Other players that the player has not been paired with.
       let notTeamedWith = [];
       const player = needingTeam[0];
-      console.log('player', player)
 
       Object.keys(teammateCounters[player - 1]).forEach(p => {
         p = parseInt(p);
@@ -79,21 +71,17 @@ const TeamGenerator = () => {
       const teammates = [];
       
       if (notTeamedWith.length === 0 || notTeamedWith.length === 1) {
-        console.log('not teamed with', notTeamedWith)
         teammates.push(needingTeam[1]);
         teammates.push(needingTeam[2]);
       } else {
         const notTeamedWithAndNeedingTeam = shuffle(notTeamedWith.filter(p => needingTeam.includes(p)));
-        console.log('not teamed with shuffled', notTeamedWithAndNeedingTeam)
         teammates.push(notTeamedWithAndNeedingTeam[0]);
         teammates.push(notTeamedWithAndNeedingTeam[1]);
       }
 
       const team = [player, ...teammates];
-      console.log('team', team)
       teams.push(team);
       needingTeam = needingTeam.filter(p => !team.includes(p) || !team.includes(player));
-      console.log('needing team', needingTeam)
     }
     
     return teams;
