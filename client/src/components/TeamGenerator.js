@@ -9,20 +9,28 @@ const TeamGenerator = () => {
   let allTeammateCounters = [];
   let roundsOfTeams = [];
 
-  
-  for (let j = 0; j < 1000; j++) {
-    const playersShuffled = shuffle(players);
-    let round = [];
-    let teammateCounters = fillTeammateCounters();
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 100000; j++) {
+      const playersShuffled = shuffle(players);
+      let roundOfTeams = [];
+      let teammateCounters = [];
+      if (i === 0) {
+        teammateCounters =  fillTeammateCounters();
+      } else {
+        teammateCounters = allTeammateCounters[j];
+      }
 
-    for (let k = 0; k < numTeams; k++) {
-      const team = playersShuffled.slice(k * 3, k * 3 + 3);
-      round.push(team);
+      for (let k = 0; k < numTeams; k++) {
+        const team = playersShuffled.slice(k * 3, k * 3 + 3);
+        roundOfTeams.push(team);
+      }
+
+      // roundsOfTeams.push(roundOfTeams);
+      allTeammateCounters[j] = getTeammateCounters(teammateCounters, roundOfTeams);
     }
-
-    teammateCounters = getTeammateCounters(teammateCounters, round);
-    allTeammateCounters.push(teammateCounters);
   }
+  
+  // console.log('rounds of teams', roundsOfTeams)
 
   let numberOfOnesPerCounter = [];
   allTeammateCounters.forEach(round => {
@@ -36,7 +44,11 @@ const TeamGenerator = () => {
     });
     numberOfOnesPerCounter.push(numberOfOnes);
   });
-  console.log(numberOfOnesPerCounter)
+
+  const max = Math.max.apply(Math, numberOfOnesPerCounter);
+  console.log('max', max)
+  const indexmax = numberOfOnesPerCounter.indexOf(max);
+  console.log('max counters', allTeammateCounters[indexmax])
 
     // Fill teammateCounters with empty values to represent that a player
   // has not yet played with any player.
