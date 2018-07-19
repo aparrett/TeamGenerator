@@ -39,8 +39,7 @@ const TeamGenerator = () => {
     teammateCounters = counters;
   }
 
-  // roundNumber can be removed, its just for logging
-  function generateRoundOfTeams(roundNumber) {
+  function generateRoundOfTeams() {
     let teams = [];
     if (roundsOfTeams.length === 0) {
       const playersShuffled = shuffle(players);
@@ -56,20 +55,15 @@ const TeamGenerator = () => {
     let needingTeam = shuffle(players);
     
     while(needingTeam.length > 0){
-      if (needingTeam.length === teamSize) {
-        teams.push(needingTeam);
-        return teams;
-      }
-
       // Other players that the player has not been paired with.
       const player = needingTeam[0];
+      needingTeam = needingTeam.filter(p => p !== player);
       const notTeamedWith = getNotTeamedWith(player);
-      
+
       console.log('player', player)
       console.log('teammates', teammateCounters[player - 1])
 
       const teammates = getTeammates(needingTeam, notTeamedWith);
-      
       const team = [player, ...teammates];
 
       console.log('Not teamed with', notTeamedWith)
@@ -77,7 +71,7 @@ const TeamGenerator = () => {
       console.log('chosen team', team)
 
       teams.push(team);
-      needingTeam = needingTeam.filter(p => !team.includes(p) || !team.includes(player));
+      needingTeam = needingTeam.filter(p => !team.includes(p));
     }
     
     return teams;
@@ -96,26 +90,30 @@ const TeamGenerator = () => {
 
   function getTeammates(needingTeam, notTeamedWith) {
 
+    if (needingTeam.length === teamSize - 1) {
+      return needingTeam;
+    }
+
     const notTeamedWithAndNeedingTeam = shuffle(notTeamedWith.filter(p => needingTeam.includes(p)));
     
     if (notTeamedWith.length === 0 || notTeamedWithAndNeedingTeam.length === 0) {
-      return [needingTeam[1], needingTeam[2]];
+      return [needingTeam[0], needingTeam[1]];
     } 
     
     if (notTeamedWith.length === 1) {
-      if (needingTeam[1] === notTeamedWith[0]) {
-        return [notTeamedWith[0], needingTeam[2]];
+      if (needingTeam[0] === notTeamedWith[0]) {
+        return [notTeamedWith[0], needingTeam[1]];
       }
       
-      return [notTeamedWith[0], needingTeam[1]];
+      return [notTeamedWith[0], needingTeam[0]];
     }
 
     if (notTeamedWithAndNeedingTeam.length === 1) {
-      if (needingTeam[1] === notTeamedWithAndNeedingTeam[0]) {
-        return [notTeamedWithAndNeedingTeam[0], needingTeam[2]];
+      if (needingTeam[0] === notTeamedWithAndNeedingTeam[0]) {
+        return [notTeamedWithAndNeedingTeam[0], needingTeam[1]];
       }
       
-      return [notTeamedWithAndNeedingTeam[0], needingTeam[1]];
+      return [notTeamedWithAndNeedingTeam[0], needingTeam[0]];
     }
       
     return [notTeamedWithAndNeedingTeam[0], notTeamedWithAndNeedingTeam[1]];
