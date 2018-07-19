@@ -62,33 +62,36 @@ const TeamGenerator = () => {
       }
 
       // Other players that the player has not been paired with.
-      let notTeamedWith = [];
       const player = needingTeam[0];
+      const notTeamedWith = getNotTeamedWith(player);
+      
+      console.log('player', player)
       console.log('teammates', teammateCounters[player - 1])
 
-      Object.keys(teammateCounters[player - 1]).forEach(p => {
-        p = parseInt(p);
-        if (teammateCounters[player - 1][p] === 0 && p !== player - 1) {
-          notTeamedWith.push(p + 1);
-        }
-      });
-      
       const teammates = getTeammates(needingTeam, notTeamedWith);
       
       const team = [player, ...teammates];
 
-      if (roundNumber > 4) {
-        console.log('player', player)
-        console.log('Not teamed with', notTeamedWith)
-        console.log('Needing Team', needingTeam)
-        console.log('chosen team', team)
-      }
+      console.log('Not teamed with', notTeamedWith)
+      console.log('Needing Team', needingTeam)
+      console.log('chosen team', team)
 
       teams.push(team);
       needingTeam = needingTeam.filter(p => !team.includes(p) || !team.includes(player));
     }
     
     return teams;
+  }
+
+  function getNotTeamedWith(player) {
+    let notTeamedWith = [];
+    Object.keys(teammateCounters[player - 1]).forEach(p => {
+      p = parseInt(p);
+      if (teammateCounters[player - 1][p] === 0 && p !== player - 1) {
+        notTeamedWith.push(p + 1);
+      }
+    });
+    return notTeamedWith;
   }
 
   function getTeammates(needingTeam, notTeamedWith) {
