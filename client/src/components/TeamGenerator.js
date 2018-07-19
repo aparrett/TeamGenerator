@@ -13,7 +13,8 @@ const TeamGenerator = () => {
 
   // Create rounds of teams.
   for (let i = 1; i <= rounds; i++){
-    const round = generateRoundOfTeams();
+    const roundNumber = i;
+    const round = generateRoundOfTeams(roundNumber);
     roundsOfTeams.push(round);
 
     if (i === roundsNeeded) {
@@ -21,6 +22,8 @@ const TeamGenerator = () => {
     }
 
     addTeammateCounters(round);
+    const temp = teammateCounters.slice()
+    console.log('teammate counters', temp)
   }
 
   console.log('rounds of teams', roundsOfTeams);
@@ -36,7 +39,8 @@ const TeamGenerator = () => {
     teammateCounters = counters;
   }
 
-  function generateRoundOfTeams() {
+  // roundNumber can be removed, its just for logging
+  function generateRoundOfTeams(roundNumber) {
     let teams = [];
     if (roundsOfTeams.length === 0) {
       const playersShuffled = shuffle(players);
@@ -60,6 +64,7 @@ const TeamGenerator = () => {
       // Other players that the player has not been paired with.
       let notTeamedWith = [];
       const player = needingTeam[0];
+      console.log('teammates', teammateCounters[player - 1])
 
       Object.keys(teammateCounters[player - 1]).forEach(p => {
         p = parseInt(p);
@@ -68,23 +73,49 @@ const TeamGenerator = () => {
         }
       });
       
-      const teammates = [];
+      const teammates = getTeammates(needingTeam, notTeamedWith);
       
-      if (notTeamedWith.length === 0 || notTeamedWith.length === 1) {
-        teammates.push(needingTeam[1]);
-        teammates.push(needingTeam[2]);
-      } else {
-        const notTeamedWithAndNeedingTeam = shuffle(notTeamedWith.filter(p => needingTeam.includes(p)));
-        teammates.push(notTeamedWithAndNeedingTeam[0]);
-        teammates.push(notTeamedWithAndNeedingTeam[1]);
+      const team = [player, ...teammates];
+
+      if (roundNumber > 4) {
+        console.log('player', player)
+        console.log('Not teamed with', notTeamedWith)
+        console.log('Needing Team', needingTeam)
+        console.log('chosen team', team)
       }
 
-      const team = [player, ...teammates];
       teams.push(team);
       needingTeam = needingTeam.filter(p => !team.includes(p) || !team.includes(player));
     }
     
     return teams;
+  }
+
+  function getTeammates(needingTeam, notTeamedWith) {
+
+    const notTeamedWithAndNeedingTeam = shuffle(notTeamedWith.filter(p => needingTeam.includes(p)));
+    
+    if (notTeamedWith.length === 0 || notTeamedWithAndNeedingTeam.length === 0) {
+      return [needingTeam[1], needingTeam[2]];
+    } 
+    
+    if (notTeamedWith.length === 1) {
+      if (needingTeam[1] === notTeamedWith[0]) {
+        return [notTeamedWith[0], needingTeam[2]];
+      }
+      
+      return [notTeamedWith[0], needingTeam[1]];
+    }
+
+    if (notTeamedWithAndNeedingTeam.length === 1) {
+      if (needingTeam[1] === notTeamedWithAndNeedingTeam[0]) {
+        return [notTeamedWithAndNeedingTeam[0], needingTeam[2]];
+      }
+      
+      return [notTeamedWithAndNeedingTeam[0], needingTeam[1]];
+    }
+      
+    return [notTeamedWithAndNeedingTeam[0], notTeamedWithAndNeedingTeam[1]];
   }
 
   function shuffle(array) {
