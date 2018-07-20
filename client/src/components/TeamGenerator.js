@@ -9,7 +9,7 @@ const TeamGenerator = () => {
   let allTeammateCounters = [];
   let roundsOfTeams = [];
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 6; i++) {
     for (let j = 0; j < 100000; j++) {
       const playersShuffled = shuffle(players);
       let roundOfTeams = [];
