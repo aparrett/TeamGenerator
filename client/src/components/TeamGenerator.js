@@ -4,51 +4,41 @@ const TeamGenerator = () => {
   const teamSize = 3;
   const numTeams = Math.floor(players.length / teamSize);
   const rounds = 5;
-  // The rounds needed until any given player has played with everyone.
-  // const roundsNeeded = Math.floor(players.length / (teamSize - 1));
-  let allTeammateCounters = [];
-  let roundsOfTeams = [];
+  let maxOnesCount = 0;
+  let maxOnesCounters = [];
+  
+  for (let i = 0; i < 100000; i++) {
+    let teammateCounters = fillTeammateCounters();
 
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < 100000; j++) {
+    for (let j = 0; j < 4; j++) {
       const playersShuffled = shuffle(players);
       let roundOfTeams = [];
-      let teammateCounters = [];
-      if (i === 0) {
-        teammateCounters =  fillTeammateCounters();
-      } else {
-        teammateCounters = allTeammateCounters[j];
-      }
 
       for (let k = 0; k < numTeams; k++) {
         const team = playersShuffled.slice(k * 3, k * 3 + 3);
         roundOfTeams.push(team);
       }
 
-      // roundsOfTeams.push(roundOfTeams);
-      allTeammateCounters[j] = getTeammateCounters(teammateCounters, roundOfTeams);
+      teammateCounters = getTeammateCounters(teammateCounters, roundOfTeams);
     }
-  }
-  
-  // console.log('rounds of teams', roundsOfTeams)
 
-  let numberOfOnesPerCounter = [];
-  allTeammateCounters.forEach(round => {
     let numberOfOnes = 0;
-    round.forEach(player => {
+    teammateCounters.forEach(player => {
       player.forEach(timesPlayedWith => {
         if (timesPlayedWith === 1) {
           numberOfOnes++;
         }
       });
     });
-    numberOfOnesPerCounter.push(numberOfOnes);
-  });
 
-  const max = Math.max.apply(Math, numberOfOnesPerCounter);
-  console.log('max', max)
-  const indexmax = numberOfOnesPerCounter.indexOf(max);
-  console.log('max counters', allTeammateCounters[indexmax])
+    if (numberOfOnes > maxOnesCount){
+      maxOnesCount = numberOfOnes;
+      maxOnesCounters = teammateCounters;
+    }
+  }
+  
+  console.log('max ones', maxOnesCount);
+  console.log('max ones counters', maxOnesCounters);
 
     // Fill teammateCounters with empty values to represent that a player
   // has not yet played with any player.
